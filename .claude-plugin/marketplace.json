@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Agentic skills for cell atlas annotation and ontology-mapping review.",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "cap-tools",
       "source": "./plugins/cap-tools",
-      "description": "Search CAP's dataset catalogue, pull differential expression and per-cell-type gene expression, and read remote h5ad obs."
+      "description": "Search CAP's dataset catalogue, pull differential expression, and check per-cell-type gene expression."
     }
   ]
 }

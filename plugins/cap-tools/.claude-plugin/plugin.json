@@ -1,7 +1,7 @@
 {
   "name": "cap-tools",
-  "version": "0.2.0",
-  "description": "Find and assess cell-type annotations on CAP (celltype.info): search the dataset catalogue by consortium or tissue, pull differential expression and per-cell-type gene expression, and read remote h5ad obs. For judging whether an annotation and its Cell Ontology mapping are sound.",
+  "version": "0.3.0",
+  "description": "Find and assess cell-type annotations on CAP (celltype.info): search the dataset catalogue by consortium or tissue, pull differential expression, and check per-cell-type gene expression. For judging whether an annotation and its Cell Ontology mapping are sound.",
   "author": {
     "name": "Cellular Semantics",
     "url": "https://github.com/Cellular-Semantics"

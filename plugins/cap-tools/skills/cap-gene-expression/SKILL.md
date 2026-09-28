@@ -23,14 +23,15 @@ is ambiguous — unexpressed, or merely outranked. This measures it directly.
 **Not** for ranked marker discovery — use `cap-degs`, which is one call per cell
 type rather than one per gene. Use this when you already know which genes matter.
 
-**Not** for per-cell `obs` annotations on their own — use `remote-h5ad-obs`. That
+**Not** for per-cell `obs` annotations on their own — use `remote-h5ad-obs`, in
+the [atlas-skills](https://github.com/Cellular-Semantics/atlas-skills) plugin. That
 needs a public `annDataUrl`, which many CAP datasets do not expose; this works
 regardless (see "Why not the h5ad").
 
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" \
     cap expression <cap-dataset-url> --genes GENE [GENE ...] [options]
 ```
 
@@ -38,12 +39,12 @@ Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $
 does not work in zsh, because the string is not re-split into words:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" cap "$@"; }
 ```
 
 
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.2.0 or later (`cap --version`).
+0.3.0 or later (`cap --version`).
 
 The full dataset URL is required; the labelset structure is read from the page.
 `cap-datasets` finds one if you have a name rather than a URL.

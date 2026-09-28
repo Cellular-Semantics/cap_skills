@@ -32,28 +32,9 @@ jobs:
       # themselves cost money and hit a live dataset, so they are never in CI.
       - run: uv run pytest packages/cap-client evals -q
 
-  h5ad-obs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: false
-      - run: uv venv --python 3.12
-      # cap-client comes from the working tree, not the published tag, so a PR
-      # that changes both packages is tested as a whole.
-      - run: uv pip install -e packages/cap-client
-      - run: uv pip install fsspec aiohttp h5py numpy pandas pyarrow certifi pytest
-      - run: uv pip install --no-deps -e packages/h5ad-obs
-      - run: uv run pytest packages/h5ad-obs -q
-
   install-from-git:
     # The published contract: what a user actually gets from the SKILL.md command.
     # Runs on main only, where the tag the skills pin is expected to exist.
-    #
-    # Note h5ad-obs is built from this SHA but resolves cap-client from the PINNED
-    # TAG, so this job does not test a cap-client change against h5ad-obs -- the
-    # h5ad-obs job above does that, from the working tree.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +46,3 @@ jobs:
         run: |
           uvx --from "git+https://github.com/${{ github.repository }}@${{ github.sha }}#subdirectory=packages/cap-client" \
             cap --version
-      - name: h5ad-obs CLI resolves and reports its version
-        run: |
-          uvx --from "git+https://github.com/${{ github.repository }}@${{ github.sha }}#subdirectory=packages/h5ad-obs" \
-            h5ad-obs --version

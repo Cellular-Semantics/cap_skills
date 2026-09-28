@@ -16,14 +16,15 @@ labelset, or have it computed on demand. Seconds, not a 476 MB download.
 - gathering marker-gene evidence for a CAS build from a CAP-hosted atlas
 
 **Not** for per-cell annotations (cell type assignments, ontology term ids,
-curator rationale) — those live in the h5ad `obs` table; use `remote-h5ad-obs`.
+curator rationale) — those live in the h5ad `obs` table; use `remote-h5ad-obs`, in the
+[atlas-skills](https://github.com/Cellular-Semantics/atlas-skills) plugin.
 **Not** for "is this gene expressed here?" — a DE list is ranked, so absence from
 it is ambiguous; use `cap-gene-expression`.
 
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" \
     cap degs <cap-dataset-url> [options]
 ```
 
@@ -31,12 +32,12 @@ Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $
 does not work in zsh, because the string is not re-split into words:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" cap "$@"; }
 ```
 
 
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.2.0 or later (`cap --version`).
+0.3.0 or later (`cap --version`).
 
 The full dataset URL is required (not a bare id): the labelset structure is read
 from the dataset page. `cap-datasets` finds one if you have a name rather than a URL. Start with `cap labelsets <url>` when unsure which

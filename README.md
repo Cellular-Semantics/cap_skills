@@ -12,8 +12,7 @@ never contains non-trivial code.
 
 ```
 packages/cap-client/     CAP (celltype.info) GraphQL client + `cap` CLI
-packages/h5ad-obs/       remote h5ad obs reader + `h5ad-obs` CLI
-plugins/cap-tools/       the 4 skills, pinned to a package tag
+plugins/cap-tools/       the 3 skills, pinned to a package tag
 .claude-plugin/          marketplace manifest
 ```
 
@@ -33,13 +32,13 @@ In Claude Code:
 
 The skills invoke their CLIs with `uvx --from git+…@vX.Y.Z`, so the only
 prerequisites are `uv` and network access to GitHub on first run. Environments are
-cached after that; the first `h5ad-obs` call is slow while uv builds h5py and pandas.
+cached after that.
 
 ## Use the CLIs directly
 
 ```sh
 # A function, not a variable: `CAP="uvx …"; $CAP …` does not re-split in zsh.
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" cap "$@"; }
 
 cap datasets --consortium "Human Cell Atlas" --format text
 cap labelsets https://celltype.info/project/1030/dataset/3400
@@ -71,6 +70,18 @@ validating its transform against two known-good queries first.
 Two live tests pin conclusions from a real annotation review — STMN1 at ~54.5% in
 Tuft Progenitors versus ~47.1% in Tuft Cells, and `LRMP` failing to resolve because
 the symbol was retired in 2020 — so a refactor that changes the numbers is caught.
+
+## Reading per-cell obs
+
+`remote-h5ad-obs` used to live here. It is portal-agnostic — it reads any remote
+h5ad over range requests — so it now lives in
+[atlas-skills](https://github.com/Cellular-Semantics/atlas-skills), and this repo
+carries no h5ad dependencies at all. The two plugins install side by side, and
+`cap h5ad-url` bridges them:
+
+```sh
+h5ad-obs "$(cap h5ad-url https://celltype.info/project/934/dataset/3016 --format text)"
+```
 
 ## Skill evals
 
