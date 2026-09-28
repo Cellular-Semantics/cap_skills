@@ -2,9 +2,18 @@
   "name": "cap-tools",
   "version": "0.1.0",
   "description": "Read cell-type annotation evidence out of CAP (celltype.info): differential expression, per-cell-type gene expression, and remote h5ad obs. For assessing whether an annotation and its Cell Ontology mapping are sound.",
-  "author": { "name": "David Osumi-Sutherland" },
-  "homepage": "https://github.com/dosumis/atlas-curation-skills",
-  "repository": "https://github.com/dosumis/atlas-curation-skills",
+  "author": {
+    "name": "Cellular Semantics",
+    "url": "https://github.com/Cellular-Semantics"
+  },
+  "homepage": "https://github.com/Cellular-Semantics/cap_skills",
+  "repository": "https://github.com/Cellular-Semantics/cap_skills",
   "license": "MIT",
-  "keywords": ["single-cell", "cell-annotation", "cell-ontology", "celltype.info", "anndata"]
+  "keywords": [
+    "single-cell",
+    "cell-annotation",
+    "cell-ontology",
+    "celltype.info",
+    "anndata"
+  ]
 }

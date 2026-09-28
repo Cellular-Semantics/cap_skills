@@ -4,7 +4,7 @@ Reads cell-type annotation evidence out of [CAP](https://celltype.info) through
 its public GraphQL endpoint. No browser, no authentication, no h5ad download.
 
 ```sh
-uvx --from "git+https://github.com/dosumis/atlas-curation-skills@v0.1.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client" \
     cap degs https://celltype.info/project/1030/dataset/3400 --labelset hgca_celltype_v1
 ```
 

@@ -9,7 +9,7 @@ hosts). A [CAP](https://celltype.info) dataset URL is also accepted and resolved
 to its underlying h5ad via `cap-client`.
 
 ```sh
-uvx --from "git+https://github.com/dosumis/atlas-curation-skills@v0.1.0#subdirectory=packages/h5ad-obs" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/h5ad-obs" \
     h5ad-obs https://celltype.info/project/1030/dataset/3400 --list-columns
 ```
 

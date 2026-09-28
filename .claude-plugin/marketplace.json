@@ -1,6 +1,9 @@
 {
-  "name": "atlas-curation-skills",
-  "owner": { "name": "David Osumi-Sutherland" },
+  "name": "cap_skills",
+  "owner": {
+    "name": "Cellular Semantics",
+    "url": "https://github.com/Cellular-Semantics"
+  },
   "metadata": {
     "description": "Agentic skills for cell atlas annotation and ontology-mapping review.",
     "version": "0.1.0"

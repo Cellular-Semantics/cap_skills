@@ -25,7 +25,7 @@ mean reading `X`, which is a real download. For a handful of genes use
 ## Command
 
 ```sh
-OBS="uvx --from git+https://github.com/dosumis/atlas-curation-skills@v0.1.0#subdirectory=packages/h5ad-obs h5ad-obs"
+OBS="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/h5ad-obs h5ad-obs"
 
 $OBS <url> [options]
 ```

@@ -1,4 +1,4 @@
-# atlas-curation-skills
+# cap_skills
 
 Agentic skills for cell atlas annotation and ontology-mapping review, plus the
 packages they call.
@@ -27,7 +27,7 @@ only ever seen the plugin directory.
 In Claude Code:
 
 ```
-/plugin marketplace add dosumis/atlas-curation-skills
+/plugin marketplace add Cellular-Semantics/cap_skills
 /plugin install cap-tools
 ```
 
@@ -38,7 +38,7 @@ cached after that; the first `h5ad-obs` call is slow while uv builds h5py and pa
 ## Use the CLIs directly
 
 ```sh
-CAP="uvx --from git+https://github.com/dosumis/atlas-curation-skills@v0.1.0#subdirectory=packages/cap-client cap"
+CAP="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client cap"
 
 $CAP labelsets https://celltype.info/project/1030/dataset/3400
 $CAP degs https://celltype.info/project/1030/dataset/3400 \

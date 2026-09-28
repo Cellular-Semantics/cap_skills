@@ -23,7 +23,7 @@ it is ambiguous; use `cap-gene-expression`.
 ## Command
 
 ```sh
-CAP="uvx --from git+https://github.com/dosumis/atlas-curation-skills@v0.1.0#subdirectory=packages/cap-client cap"
+CAP="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client cap"
 
 $CAP degs <cap-dataset-url> [options]
 ```
