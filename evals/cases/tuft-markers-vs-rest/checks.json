@@ -1,0 +1,11 @@
+{
+  "tags": ["degs"],
+  "checks": [
+    {"kind": "command_matches", "pattern": "cap[-_ ]?degs|cap\\s+degs",
+     "why": "ranked marker discovery is the DE path, not one gene at a time"},
+    {"kind": "answer_any_of",
+     "patterns": ["TRPM5", "GNAT3", "GNG13", "SH2D7", "SH2D6", "IRAG2", "AVIL", "BMX", "HCK", "POU2F3", "PLCG2", "HTR3E", "ALOX5", "HPGDS", "IL17RB", "PTGS1"],
+     "min_hits": 3,
+     "why": "the canonical tuft programme. Deliberately a union over both rankings: logFC returns TRPM5/GNAT3/GNG13/SH2D7/HTR3E, score returns IRAG2/SH2D6/AVIL/BMX/HCK/POU2F3, and either is a correct answer"}
+  ]
+}

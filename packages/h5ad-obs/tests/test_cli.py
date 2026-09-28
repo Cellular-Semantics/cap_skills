@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from conftest import N_CELLS
 from h5ad_obs import cli
 

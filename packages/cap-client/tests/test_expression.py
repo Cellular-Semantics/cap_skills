@@ -1,4 +1,5 @@
 import pytest
+
 from cap_client.errors import CapError
 from cap_client.expression import ROW_FIELDS, detect_embedding, fetch_expression, obs_columns
 from conftest import FakeClient, errors

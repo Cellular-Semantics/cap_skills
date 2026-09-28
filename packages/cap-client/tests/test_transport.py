@@ -3,6 +3,7 @@ import json
 import urllib.error
 
 import pytest
+
 from cap_client.errors import CapError
 from cap_client.transport import GraphQLClient, first_error
 

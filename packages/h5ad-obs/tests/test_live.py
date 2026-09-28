@@ -7,6 +7,7 @@ Needs a URL to read, since no public h5ad is stable enough to hard-code:
 import os
 
 import pytest
+
 from h5ad_obs import read_obs
 from h5ad_obs.reader import check_range_support, list_columns
 

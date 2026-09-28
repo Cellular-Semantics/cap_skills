@@ -11,7 +11,9 @@ cd "$(dirname "$0")"
 echo "== cap-client"
 uv venv -q --allow-existing packages/cap-client/.venv
 uv pip install -q -e "packages/cap-client[test]" --python packages/cap-client/.venv/bin/python
-packages/cap-client/.venv/bin/python -m pytest packages/cap-client "$@"
+# The eval *graders* are pure and free to test; the eval runs themselves are not
+# (real agent runs against celltype.info) and are never part of this script.
+packages/cap-client/.venv/bin/python -m pytest packages/cap-client evals "$@"
 
 echo "== h5ad-obs"
 uv venv -q --allow-existing packages/h5ad-obs/.venv

@@ -103,6 +103,15 @@ cross-check with `score`.
 **A curated marker that fails to discriminate is a finding, not a bad query.**
 Report it.
 
+**In a sibling comparison the ranking can change the biology, not just the
+order.** Tuft Progenitors vs Tuft Cells returns, by `log_fold_change`, a
+cell-cycle tier — CHEK1, CDCA3, AURKB, CKAP2L, E2F1, RAD51, CDC6, NEK2 — and by
+`score`, a secretory/absorptive one — TSPAN8, PHGR1, PIGR, AGR2, KRT19, FABP1.
+Both are true of the same comparison and they support different readings of the
+label: the first supports the *progenitor* claim, the second places the
+population in the epithelial hierarchy. Run both before concluding what separates
+two siblings, and say which ranking a reported gene list came from.
+
 ## Sorting: logFC vs score
 
 Neither is universally better.

@@ -1,0 +1,56 @@
+{
+  "tags": [
+    "degs",
+    "sibling"
+  ],
+  "checks": [
+    {
+      "kind": "command_matches",
+      "pattern": "cap[-_ ]?degs|cap\\s+degs",
+      "why": "a 'what distinguishes X from Y' question is a DE question"
+    },
+    {
+      "kind": "command_matches",
+      "pattern": "--vs",
+      "why": "siblings need a paired comparison; vs-rest between two members of one lineage returns what they SHARE"
+    },
+    {
+      "kind": "answer_any_of",
+      "patterns": [
+        "CHEK1",
+        "CDCA3",
+        "AURKB",
+        "CKAP2L",
+        "E2F1",
+        "RAD51",
+        "CDC6",
+        "CEP55",
+        "NEK2",
+        "PBK",
+        "DEPDC1",
+        "MKI67",
+        "TOP2A",
+        "ASPM",
+        "BIRC5",
+        "TSPAN8",
+        "PHGR1",
+        "PIGR",
+        "AGR2",
+        "KRT19",
+        "FABP1",
+        "MGST1",
+        "FAM3D",
+        "CDC42EP5",
+        "ANXA2"
+      ],
+      "min_hits": 2,
+      "why": "names genes it actually got back. Deliberately a union over both rankings: measured 2026-09-28, logFC returns the cell-cycle tier (CHEK1/CDCA3/AURKB/E2F1/RAD51) and score returns a secretory/absorptive one (TSPAN8/PHGR1/PIGR/AGR2) -- the same sibling comparison, two correct answers"
+    },
+    {
+      "kind": "answer_not_matches",
+      "pattern": "indistinguishable|no (?:real |clear )?difference|identical populations",
+      "why": "the labels do discriminate; concluding otherwise is the failure mode vs-rest DE produces"
+    }
+  ],
+  "max_turns": 30
+}

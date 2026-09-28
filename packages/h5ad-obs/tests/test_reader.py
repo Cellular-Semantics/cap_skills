@@ -3,6 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 import pytest
+
 from conftest import N_CELLS
 from h5ad_obs import read_obs
 from h5ad_obs.reader import ObsReadError, check_range_support, decode, list_columns

@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from cap_client.errors import CapError
 from cap_client.labelsets import (
     fetch_labelsets,

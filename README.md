@@ -70,6 +70,21 @@ Two live tests pin conclusions from a real annotation review — STMN1 at ~54.5%
 Tuft Progenitors versus ~47.1% in Tuft Cells, and `LRMP` failing to resolve because
 the symbol was retired in 2020 — so a refactor that changes the numbers is caught.
 
+## Skill evals
+
+`evals/` holds the behavioural layer: does the right skill fire from an
+intent-shaped prompt, does the agent reach for the right flag, does it read the
+result correctly.
+
+```sh
+python3 evals/runner.py --dry-run     # prompts only, free
+python3 evals/runner.py               # the suite: ~$2, hits celltype.info
+```
+
+Not in CI — they cost money and depend on a live third-party dataset. The
+graders themselves are unit-tested and free (`pytest evals`). See
+`evals/README.md`; `./dev.sh` runs the grader tests alongside the packages.
+
 ## Rules for changes
 
 - Deterministic and testable → a package, with tests. About when/how/why → skill text.

@@ -1,0 +1,35 @@
+{
+  "tags": [
+    "expression",
+    "judgment",
+    "gene-symbols"
+  ],
+  "checks": [
+    {
+      "kind": "command_matches",
+      "pattern": "LRMP",
+      "why": "tries the symbol it was given"
+    },
+    {
+      "kind": "command_matches",
+      "pattern": "IRAG2",
+      "why": "recovers by retrying under the current symbol rather than stopping at the failure"
+    },
+    {
+      "kind": "answer_matches",
+      "pattern": "IRAG2",
+      "why": "tells the user which symbol the number actually belongs to"
+    },
+    {
+      "kind": "answer_matches",
+      "pattern": "retired|renamed|withdrawn|superseded|previous symbol|old symbol|approved symbol|no longer",
+      "why": "explains WHY LRMP returned nothing: a symbol change, not absent biology"
+    },
+    {
+      "kind": "numeric_present",
+      "min": 95.0,
+      "max": 100.0,
+      "why": "IRAG2 is detected in ~97.9% of Tuft Cells -- the best tuft marker in the panel"
+    }
+  ]
+}

@@ -28,7 +28,9 @@ jobs:
       - run: uv venv --python ${{ matrix.python }}
       - run: uv pip install -e "packages/cap-client[test]"
       # Live tests are excluded by the package's addopts: they hit celltype.info.
-      - run: uv run pytest packages/cap-client -q
+      # The eval *graders* are pure functions and free to test; the eval runs
+      # themselves cost money and hit a live dataset, so they are never in CI.
+      - run: uv run pytest packages/cap-client evals -q
 
   h5ad-obs:
     runs-on: ubuntu-latest

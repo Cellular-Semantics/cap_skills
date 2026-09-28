@@ -1,0 +1,29 @@
+{
+  "tags": [
+    "expression",
+    "tool-choice"
+  ],
+  "checks": [
+    {
+      "kind": "command_matches",
+      "pattern": "cap[-_ ]?(?:gene[-_])?expression|cap\\s+expression",
+      "why": "'is it expressed' is a pct_detected question, not a ranked-DE question"
+    },
+    {
+      "kind": "command_matches",
+      "pattern": "--genes[^\\n]*STMN1",
+      "why": "asks for the gene it was asked about"
+    },
+    {
+      "kind": "numeric_present",
+      "min": 44.0,
+      "max": 50.0,
+      "why": "STMN1 is detected in ~47.1% of Tuft Cells"
+    },
+    {
+      "kind": "answer_not_matches",
+      "pattern": "not expressed|no expression|absent from",
+      "why": "it is expressed in about half the population; the trap is reading a DE list's silence as absence"
+    }
+  ]
+}

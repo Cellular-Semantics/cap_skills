@@ -1,0 +1,11 @@
+{
+  "tags": ["tool-choice", "obs"],
+  "checks": [
+    {"kind": "command_matches", "pattern": "--list-obs-columns",
+     "why": "this dataset exposes no anonymous annDataUrl, so the h5ad route is closed and the obs-column probe is the way in"},
+    {"kind": "answer_matches", "pattern": "tissue",
+     "why": "answers the question actually asked"},
+    {"kind": "answer_not_matches", "pattern": "cannot (?:be )?(?:determined|accessed|retrieved)|not possible|unable to",
+     "why": "an annDataUrl of null is not a dead end; reporting one is the failure"}
+  ]
+}

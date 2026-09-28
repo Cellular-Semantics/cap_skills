@@ -7,6 +7,7 @@ QUERY_NOT_IN_SAFELIST, and only a real request finds out.
     pytest -m live
 """
 import pytest
+
 from cap_client.degs import fetch_degs
 from cap_client.downloads import download_urls, resolve_h5ad_url
 from cap_client.expression import detect_embedding, fetch_expression

@@ -1,6 +1,7 @@
 import random
 
 import pytest
+
 from cap_client.errors import CapError
 from cap_client.session import blank_label, create_session, new_session_id
 from conftest import LABELSET, SESSION_OK, TISSUE_LABELSET, FakeClient, errors

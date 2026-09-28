@@ -4,11 +4,12 @@ import json
 import pathlib
 
 import pytest
-from cap_client import cli
-from conftest import LABELSETS
 from test_degs import base_handlers
 from test_expression import OBS_PROBE_ERROR
 from test_expression import handler as expr_handler
+
+from cap_client import cli
+from conftest import LABELSETS
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 

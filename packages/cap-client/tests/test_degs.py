@@ -1,6 +1,7 @@
 import base64
 
 import pytest
+
 from cap_client.degs import ROW_FIELDS, decode_diff_key, fetch_degs
 from cap_client.errors import CapError
 from conftest import SESSION_OK, FakeClient, de_payload, errors, gene

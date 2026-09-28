@@ -1,0 +1,41 @@
+{
+  "tags": [
+    "expression",
+    "cross-check",
+    "judgment"
+  ],
+  "checks": [
+    {
+      "kind": "command_matches",
+      "pattern": "cap[-_ ]?(?:gene[-_])?expression|cap\\s+expression",
+      "why": "whether a marker discriminates is settled by pct_detected in both populations"
+    },
+    {
+      "kind": "command_matches",
+      "pattern": "Tuft Progenitors",
+      "why": "must measure the label under test"
+    },
+    {
+      "kind": "command_matches",
+      "pattern": "Tuft Cells",
+      "why": "and the comparator; one population alone cannot answer a discrimination question"
+    },
+    {
+      "kind": "numeric_present",
+      "min": 53.0,
+      "max": 56.0,
+      "why": "STMN1 in Tuft Progenitors, ~54.5% detected"
+    },
+    {
+      "kind": "numeric_present",
+      "min": 45.5,
+      "max": 48.5,
+      "why": "STMN1 in Tuft Cells, ~47.1% detected -- both numbers are needed, since a discrimination question cannot be answered from one population"
+    },
+    {
+      "kind": "answer_matches",
+      "pattern": "does not discriminat|doesn't discriminat|fails to discriminat|not (?:a )?discriminat|poor(?:ly)? discriminat|non-discriminating|does not distinguish|doesn't distinguish",
+      "why": "the finding: a curated marker that does not separate the label from its sibling"
+    }
+  ]
+}
