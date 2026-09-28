@@ -124,6 +124,58 @@ def test_list_obs_columns(capsys, stub):
     assert payload["embedding"] == "umap"
 
 
+def test_datasets_json_golden(capsys, stub, monkeypatch):
+    from test_datasets import HIT, TAGS_OK
+    stub({"SearchDatasets": {"data": {"results": [HIT]}},
+          "SetProjectTagsDialogQuery": TAGS_OK})
+    out = run(capsys, ["datasets", "--consortium", "Human Cell Atlas"])
+    golden("datasets.json", json.loads(out.out))
+
+
+def test_datasets_text_format(capsys, stub):
+    from test_datasets import HIT, TAGS_OK
+    stub({"SearchDatasets": {"data": {"results": [HIT]}},
+          "SetProjectTagsDialogQuery": TAGS_OK})
+    out = run(capsys, ["datasets", "--format", "text"])
+    assert "3400" in out.out and "944,502" in out.out
+    assert "Human Gut Cell Atlas" in out.out
+
+
+def test_datasets_warns_when_the_page_is_full(capsys, stub):
+    """Exactly --limit rows back means there are probably more, and a silent
+    truncation would look like a complete catalogue."""
+    from test_datasets import HIT
+    stub({"SearchDatasets": {"data": {"results": [HIT, HIT]}}})
+    out = run(capsys, ["datasets", "--limit", "2"])
+    assert "there may be more" in out.err
+
+
+def test_datasets_csv_flattens_tags(capsys, stub, tmp_path):
+    from test_datasets import HIT
+    stub({"SearchDatasets": {"data": {"results": [HIT]}}})
+    csv_path = tmp_path / "d.csv"
+    run(capsys, ["datasets", "--csv", str(csv_path)])
+    header, row = csv_path.read_text().splitlines()[:2]
+    assert header.startswith("dataset_id,dataset_name,cell_count")
+    assert "Human Cell Atlas" in row
+
+
+def test_consortia_listing(capsys, stub):
+    from test_datasets import HIT, TAGS_OK
+    stub({"SearchDatasets": {"data": {"results": [HIT]}},
+          "SetProjectTagsDialogQuery": TAGS_OK})
+    out = run(capsys, ["consortia", "--format", "text"])
+    assert "Human Cell Atlas" in out.out
+
+
+def test_unknown_consortium_exits_nonzero(capsys, stub):
+    from test_datasets import HIT, TAGS_OK
+    stub({"SearchDatasets": {"data": {"results": [HIT]}},
+          "SetProjectTagsDialogQuery": TAGS_OK})
+    assert cli.main(["datasets", "--consortium", "Nope"]) == 1
+    assert "Unknown consortium" in capsys.readouterr().err
+
+
 def test_download_urls(capsys, stub):
     stub({"DownloadUrls": {"data": {"downloadUrls": {
         "annDataUrl": "https://example.org/a.h5ad", "seuratUrl": None,

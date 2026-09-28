@@ -23,16 +23,23 @@ it is ambiguous; use `cap-gene-expression`.
 ## Command
 
 ```sh
-CAP="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client cap"
-
-$CAP degs <cap-dataset-url> [options]
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" \
+    cap degs <cap-dataset-url> [options]
 ```
 
+Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $CAP degs`
+does not work in zsh, because the string is not re-split into words:
+
+```sh
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
+```
+
+
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.1.0 or later (`$CAP --version`).
+0.2.0 or later (`cap --version`).
 
 The full dataset URL is required (not a bare id): the labelset structure is read
-from the dataset page. Start with `$CAP labelsets <url>` when unsure which
+from the dataset page. `cap-datasets` finds one if you have a name rather than a URL. Start with `cap labelsets <url>` when unsure which
 annotation level you want.
 
 **Options that change the answer, not just the volume:**
@@ -167,14 +174,14 @@ session creation fails; report that rather than attempting auth.
 longer match. Regenerate them:
 
 ```sh
-$CAP recover-queries
+cap recover-queries
 ```
 
 It validates its own transform against two known-good queries first and refuses
 to emit anything if that check fails, in which case re-capture from browser
 devtools (Network → graphql → request payload). Either way the fix is a change to
 `cap-client`, not to this skill: open an issue or a PR against
-`packages/cap-client/src/cap_client/queries.py`. `$CAP introspect <TypeName>`
+`packages/cap-client/src/cap_client/queries.py`. `cap introspect <TypeName>`
 dumps an input shape — introspection is enabled — rather than guessing.
 
 ## Verified against

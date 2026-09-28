@@ -1,0 +1,22 @@
+{
+  "consortium_tag_ids": [
+    "1"
+  ],
+  "datasets": [
+    {
+      "cell_count": 944502,
+      "consortium_tags": [
+        "Human Cell Atlas"
+      ],
+      "created_at": "2026-02-01T00:00:00.000Z",
+      "dataset_id": "3400",
+      "dataset_name": "Human Gut Cell Atlas (HGCA) v1 - All Cells",
+      "project_id": "1030",
+      "project_name": "Human Gut Cell Atlas",
+      "url": "https://celltype.info/project/1030/dataset/3400"
+    }
+  ],
+  "limit": 500,
+  "n_datasets": 1,
+  "offset": 0
+}

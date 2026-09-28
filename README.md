@@ -38,12 +38,14 @@ cached after that; the first `h5ad-obs` call is slow while uv builds h5py and pa
 ## Use the CLIs directly
 
 ```sh
-CAP="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client cap"
+# A function, not a variable: `CAP="uvx …"; $CAP …` does not re-split in zsh.
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
 
-$CAP labelsets https://celltype.info/project/1030/dataset/3400
-$CAP degs https://celltype.info/project/1030/dataset/3400 \
+cap datasets --consortium "Human Cell Atlas" --format text
+cap labelsets https://celltype.info/project/1030/dataset/3400
+cap degs https://celltype.info/project/1030/dataset/3400 \
     --labelset hgca_celltype_v1 --only "Tuft Progenitors" --vs "Tuft Cells"
-$CAP expression https://celltype.info/project/1030/dataset/3400 \
+cap expression https://celltype.info/project/1030/dataset/3400 \
     --genes MKI67 TOP2A POU2F3 --cell-types "Tuft Progenitors" "Tuft Cells"
 ```
 

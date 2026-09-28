@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Agentic skills for cell atlas annotation and ontology-mapping review.",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {

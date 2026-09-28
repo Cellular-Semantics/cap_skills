@@ -30,15 +30,23 @@ regardless (see "Why not the h5ad").
 ## Command
 
 ```sh
-CAP="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/cap-client cap"
-
-$CAP expression <cap-dataset-url> --genes GENE [GENE ...] [options]
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" \
+    cap expression <cap-dataset-url> --genes GENE [GENE ...] [options]
 ```
 
+Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $CAP degs`
+does not work in zsh, because the string is not re-split into words:
+
+```sh
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/cap-client" cap "$@"; }
+```
+
+
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.1.0 or later (`$CAP --version`).
+0.2.0 or later (`cap --version`).
 
 The full dataset URL is required; the labelset structure is read from the page.
+`cap-datasets` finds one if you have a name rather than a URL.
 Gene symbols are matched **exactly** against the dataset's var index — no
 case-folding, no alias resolution.
 
@@ -130,7 +138,7 @@ this; the filtering is local.
 
 ## When it breaks
 
-`QUERY_NOT_IN_SAFELIST` means CAP redeployed. Run `$CAP recover-queries`; it
+`QUERY_NOT_IN_SAFELIST` means CAP redeployed. Run `cap recover-queries`; it
 validates its transform against two known-good queries and refuses to emit if that
 check fails, in which case re-capture from browser devtools (Network → graphql →
 request payload). The fix belongs in `cap-client`, not here.

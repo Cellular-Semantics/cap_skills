@@ -25,15 +25,14 @@ mean reading `X`, which is a real download. For a handful of genes use
 ## Command
 
 ```sh
-OBS="uvx --from git+https://github.com/Cellular-Semantics/cap_skills@v0.1.0#subdirectory=packages/h5ad-obs h5ad-obs"
-
-$OBS <url> [options]
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.2.0#subdirectory=packages/h5ad-obs" \
+    h5ad-obs <url> [options]
 ```
 
 Needs `uv` and network access to GitHub on first run — this one pulls h5py,
 pandas, fsspec and pyarrow, so expect the first invocation to take a minute while
-uv builds the environment. Cached thereafter. Expects `h5ad-obs` 0.1.0 or later
-(`$OBS --version`).
+uv builds the environment. Cached thereafter. Expects `h5ad-obs` 0.2.0 or later
+(`h5ad-obs --version`).
 
 `<url>` is either a direct h5ad URL or a `celltype.info/project/<p>/dataset/<d>`
 URL, which is resolved to its `annDataUrl` first. **Many CAP datasets expose no

@@ -8,6 +8,7 @@ QUERY_NOT_IN_SAFELIST, and only a real request finds out.
 """
 import pytest
 
+from cap_client.datasets import consortium_tags, search_datasets
 from cap_client.degs import fetch_degs
 from cap_client.downloads import download_urls, resolve_h5ad_url
 from cap_client.expression import detect_embedding, fetch_expression
@@ -108,3 +109,35 @@ def test_download_urls_query_is_still_safelisted(dataset):
 def test_resolve_h5ad_passes_through_a_plain_url():
     plain = "https://example.org/atlas.h5ad"
     assert resolve_h5ad_url(GraphQLClient(log=lambda m: None), plain) == plain
+
+
+def test_dataset_search_is_still_safelisted():
+    """The whole public catalogue. 127 datasets as of 2026-09-28; the assertion is
+    loose because CAP adds datasets, but zero or a truncation would mean breakage."""
+    rows = search_datasets(GraphQLClient(min_interval=0.5, log=lambda m: None))
+    assert len(rows) > 100
+    assert all(r["dataset_id"] and r["url"].startswith("https://celltype.info/") for r in rows)
+
+
+def test_hca_filter_matches_the_known_set():
+    """61 HCA datasets, and dataset 3400 is one of them. Verified 2026-09-28 against
+    an independent Playwright scrape of the search page: identical ids, all 61."""
+    client = GraphQLClient(min_interval=0.5, log=lambda m: None)
+    rows = search_datasets(client, consortium_tag_ids=["1"])
+    assert len(rows) >= 55, len(rows)
+    assert all("Human Cell Atlas" in r["consortium_tags"] for r in rows)
+    assert TARGET.rsplit("/", 1)[-1] in {r["dataset_id"] for r in rows}
+
+
+def test_labelsets_are_suppressed_in_the_default_search():
+    """The payload guard: without the sentinel this response is ~2.4 MB."""
+    import json as _json
+    rows = search_datasets(GraphQLClient(min_interval=0.5, log=lambda m: None),
+                           consortium_tag_ids=["1"])
+    assert all("labelsets" not in r for r in rows)
+    assert len(_json.dumps(rows)) < 200_000, "labelset suppression has stopped working"
+
+
+def test_consortium_tags_resolve():
+    tags = consortium_tags(GraphQLClient(min_interval=0.5, log=lambda m: None))
+    assert any(t["title"] == "Human Cell Atlas" and t["id"] == "1" for t in tags)

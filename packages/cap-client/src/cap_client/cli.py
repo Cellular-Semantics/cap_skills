@@ -14,6 +14,8 @@ import argparse
 import sys
 
 from . import __version__
+from .datasets import DEFAULT_LIMIT, consortium_tags, resolve_consortium, search_datasets
+from .datasets import FIELDS as DATASET_FIELDS
 from .degs import ROW_FIELDS as DEG_FIELDS
 from .degs import SORT_KEYS, fetch_degs
 from .downloads import download_urls, resolve_h5ad_url
@@ -43,6 +45,47 @@ def _common(ap: argparse.ArgumentParser) -> None:
                          "always serial; this spaces them out further.")
     ap.add_argument("--format", default="json", choices=["json", "text"],
                     help="stdout format (default json)")
+
+
+# --- cap datasets ----------------------------------------------------------
+
+def cmd_datasets(args) -> int:
+    client = _client(args)
+    tag_ids = resolve_consortium(client, args.consortium) if args.consortium else None
+    rows = search_datasets(
+        client, consortium_tag_ids=tag_ids, name=args.name,
+        project_name=args.project_name, project_description=args.project_description,
+        cell_types=args.cell_type, labelset=args.labelset,
+        labelset_names=args.with_labelsets, limit=args.limit, offset=args.offset)
+
+    if args.csv:
+        write_csv(args.csv, DATASET_FIELDS,
+                  [{**r, "consortium_tags": "|".join(r["consortium_tags"])} for r in rows])
+        _log(f"{len(rows)} rows -> {args.csv}")
+
+    if args.format == "json":
+        emit_json({"n_datasets": len(rows), "limit": args.limit, "offset": args.offset,
+                   "consortium_tag_ids": tag_ids, "datasets": rows})
+    else:
+        for r in rows:
+            tags = ",".join(r["consortium_tags"])
+            cells = f'{r["cell_count"]:,}' if r["cell_count"] is not None else "?"
+            print(f'{r["dataset_id"]:>7}  {cells:>12}  {tags:20s} {r["dataset_name"]}')
+        print(f"\n{len(rows)} datasets", file=sys.stderr)
+    if len(rows) == args.limit:
+        _log(f"warning: exactly --limit ({args.limit}) rows came back; there may be "
+             "more. Raise --limit or page with --offset.")
+    return 0
+
+
+def cmd_consortia(args) -> int:
+    tags = consortium_tags(_client(args))
+    if args.format == "json":
+        emit_json({"n_tags": len(tags), "consortium_tags": tags})
+    else:
+        for t in tags:
+            print(f'{t["id"]:>4}  {t["title"]}')
+    return 0
 
 
 # --- cap labelsets ---------------------------------------------------------
@@ -222,6 +265,40 @@ def build_parser() -> argparse.ArgumentParser:
         prog="cap", description="Read annotation evidence out of CAP (celltype.info).")
     ap.add_argument("--version", action="version", version=f"cap-client {__version__}")
     sub = ap.add_subparsers(dest="command", required=True)
+
+    p = sub.add_parser("datasets", help="Search CAP's dataset catalogue")
+    p.add_argument("--consortium", action="append", metavar="ID_OR_NAME",
+                   help="Only datasets tagged by this consortium; id or name, "
+                        "case-insensitive (e.g. 1 or 'Human Cell Atlas'). Repeatable. "
+                        "The consortium tag is NOT in CAP's OLS report -- this is the "
+                        "only way to get it.")
+    p.add_argument("--name", help="Substring match on dataset name")
+    p.add_argument("--project-name", help="Substring match on project name")
+    p.add_argument("--project-description", help="Substring match on project description")
+    p.add_argument("--cell-type", nargs="+", metavar="NAME",
+                   help="Only datasets annotating these cell types")
+    p.add_argument("--labelset", nargs="+", metavar="NAME",
+                   help="Only datasets carrying a labelset with these names "
+                        "(filtered server-side)")
+    p.add_argument("--with-labelsets", nargs="*", metavar="NAME", default=None,
+                   help="Include labelsets in the output: bare for all, or named ones. "
+                        "Off by default because 'all' means every label of every "
+                        "labelset -- 2.4 MB across the 61 HCA datasets, versus 95 KB "
+                        "without. Prefer `cap labelsets <url>` for one dataset.")
+    p.add_argument("--limit", type=int, default=DEFAULT_LIMIT,
+                   help=f"Max datasets (default {DEFAULT_LIMIT}; 127 are public)")
+    p.add_argument("--offset", type=int, default=0, help="Skip this many (default 0)")
+    p.add_argument("--csv", metavar="FILE", help="Also write the rows as CSV")
+    p.add_argument("--delay", type=float, default=0.5, metavar="SECONDS",
+                   help="Minimum gap between API calls (default 0.5)")
+    p.add_argument("--format", default="json", choices=["json", "text"],
+                   help="stdout format (default json)")
+    p.set_defaults(func=cmd_datasets)
+
+    p = sub.add_parser("consortia", help="List the consortium tags datasets can carry")
+    p.add_argument("--delay", type=float, default=0.5, metavar="SECONDS")
+    p.add_argument("--format", default="json", choices=["json", "text"])
+    p.set_defaults(func=cmd_consortia)
 
     p = sub.add_parser("labelsets", help="List the labelsets and labels of a dataset")
     _common(p)

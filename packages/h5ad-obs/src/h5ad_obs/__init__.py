@@ -5,6 +5,6 @@ never touched. On a 476 MB atlas that is ~27 MB and ~8 s.
 """
 from .reader import ReadStats, read_obs
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = ["ReadStats", "__version__", "read_obs"]

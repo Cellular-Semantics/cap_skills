@@ -7,3 +7,4 @@ dist/
 build/
 .ruff_cache/
 evals/results/
+CLAUDE_dev.md
