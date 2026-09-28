@@ -9,8 +9,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: false
       - run: uvx ruff check packages/
 
   cap-client:
@@ -19,8 +21,10 @@ jobs:
       matrix:
         python: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: false
       - run: uv venv --python ${{ matrix.python }}
       - run: uv pip install -e "packages/cap-client[test]"
       # Live tests are excluded by the package's addopts: they hit celltype.info.
@@ -29,8 +33,10 @@ jobs:
   h5ad-obs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: false
       - run: uv venv --python 3.12
       # cap-client comes from the working tree, not the published tag, so a PR
       # that changes both packages is tested as a whole.
@@ -42,11 +48,17 @@ jobs:
   install-from-git:
     # The published contract: what a user actually gets from the SKILL.md command.
     # Runs on main only, where the tag the skills pin is expected to exist.
+    #
+    # Note h5ad-obs is built from this SHA but resolves cap-client from the PINNED
+    # TAG, so this job does not test a cap-client change against h5ad-obs -- the
+    # h5ad-obs job above does that, from the working tree.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: false
       - name: cap CLI resolves and reports its version
         run: |
           uvx --from "git+https://github.com/${{ github.repository }}@${{ github.sha }}#subdirectory=packages/cap-client" \
