@@ -12,7 +12,7 @@
     {
       "name": "cap-tools",
       "source": "./plugins/cap-tools",
-      "description": "Read annotation evidence out of CAP (celltype.info): differential expression per cell type, per-cell-type gene expression, and remote h5ad obs."
+      "description": "Search CAP's dataset catalogue, pull differential expression and per-cell-type gene expression, and read remote h5ad obs."
     }
   ]
 }

@@ -13,7 +13,7 @@ never contains non-trivial code.
 ```
 packages/cap-client/     CAP (celltype.info) GraphQL client + `cap` CLI
 packages/h5ad-obs/       remote h5ad obs reader + `h5ad-obs` CLI
-plugins/cap-tools/       the skills, pinned to a package tag
+plugins/cap-tools/       the 4 skills, pinned to a package tag
 .claude-plugin/          marketplace manifest
 ```
 
