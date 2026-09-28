@@ -1,0 +1,47 @@
+{
+  "dataset_id": "3400",
+  "labelsets": [
+    {
+      "id": "77",
+      "labels": [
+        {
+          "count": 100,
+          "id": "1",
+          "name": "Tuft Cells"
+        },
+        {
+          "count": 50,
+          "id": "2",
+          "name": "Tuft Progenitors"
+        },
+        {
+          "count": 3,
+          "id": "3",
+          "name": "Rare Cells"
+        }
+      ],
+      "mode": "cell-labels",
+      "n_labels": 3,
+      "name": "hgca_celltype_v1"
+    },
+    {
+      "id": "78",
+      "labels": [
+        {
+          "count": 90,
+          "id": "10",
+          "name": "small intestine"
+        },
+        {
+          "count": 60,
+          "id": "11",
+          "name": "colon"
+        }
+      ],
+      "mode": "obs",
+      "n_labels": 2,
+      "name": "tissue"
+    }
+  ],
+  "n_labelsets": 2
+}

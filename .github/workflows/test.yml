@@ -1,0 +1,57 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uvx ruff check packages/
+
+  cap-client:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv venv --python ${{ matrix.python }}
+      - run: uv pip install -e "packages/cap-client[test]"
+      # Live tests are excluded by the package's addopts: they hit celltype.info.
+      - run: uv run pytest packages/cap-client -q
+
+  h5ad-obs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv venv --python 3.12
+      # cap-client comes from the working tree, not the published tag, so a PR
+      # that changes both packages is tested as a whole.
+      - run: uv pip install -e packages/cap-client
+      - run: uv pip install fsspec aiohttp h5py numpy pandas pyarrow certifi pytest
+      - run: uv pip install --no-deps -e packages/h5ad-obs
+      - run: uv run pytest packages/h5ad-obs -q
+
+  install-from-git:
+    # The published contract: what a user actually gets from the SKILL.md command.
+    # Runs on main only, where the tag the skills pin is expected to exist.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: cap CLI resolves and reports its version
+        run: |
+          uvx --from "git+https://github.com/${{ github.repository }}@${{ github.sha }}#subdirectory=packages/cap-client" \
+            cap --version
+      - name: h5ad-obs CLI resolves and reports its version
+        run: |
+          uvx --from "git+https://github.com/${{ github.repository }}@${{ github.sha }}#subdirectory=packages/h5ad-obs" \
+            h5ad-obs --version

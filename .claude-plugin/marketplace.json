@@ -1,0 +1,15 @@
+{
+  "name": "atlas-curation-skills",
+  "owner": { "name": "David Osumi-Sutherland" },
+  "metadata": {
+    "description": "Agentic skills for cell atlas annotation and ontology-mapping review.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "cap-tools",
+      "source": "./plugins/cap-tools",
+      "description": "Read annotation evidence out of CAP (celltype.info): differential expression per cell type, per-cell-type gene expression, and remote h5ad obs."
+    }
+  ]
+}

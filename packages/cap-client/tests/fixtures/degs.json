@@ -1,0 +1,37 @@
+{
+  "cell_types_done": 1,
+  "cell_types_requested": 1,
+  "compared_to": "all other cells",
+  "dataset_id": "3400",
+  "fellback": [],
+  "labelset": "hgca_celltype_v1",
+  "labelset_id": "77",
+  "limit": 200,
+  "max_pvalue": 0.01,
+  "missing": [],
+  "n_rows": 2,
+  "rows": [
+    {
+      "cell_type": "Tuft Cells",
+      "compared_to": "all other cells",
+      "gene": "IRAG2",
+      "logFC": 8.1,
+      "method": "precomputed",
+      "n_cells": 100,
+      "pValue": 0.001,
+      "score": 300.0
+    },
+    {
+      "cell_type": "Tuft Cells",
+      "compared_to": "all other cells",
+      "gene": "POU2F3",
+      "logFC": 7.4,
+      "method": "precomputed",
+      "n_cells": 100,
+      "pValue": 0.001,
+      "score": 250.0
+    }
+  ],
+  "seed": 42,
+  "sort_by": "log_fold_change"
+}

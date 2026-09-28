@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cap-client"
+version = "0.1.0"
+description = "Read cell-type annotation evidence out of CAP (celltype.info) via its public GraphQL API."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "David Osumi-Sutherland" }]
+keywords = ["single-cell", "cell-annotation", "cell-ontology", "celltype.info"]
+dependencies = ["certifi"]
+
+[project.scripts]
+cap = "cap_client.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cap_client"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: hits celltype.info; excluded from CI"]
+addopts = "-m 'not live'"
