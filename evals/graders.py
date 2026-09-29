@@ -101,7 +101,10 @@ def grade_one(check: dict, run: Run) -> Result:
         found = []
         for m in re.finditer(pattern, run.answer, re.IGNORECASE | re.MULTILINE):
             try:
-                found.append(float(m.group(1)))
+                # Strip thousands separators. Agents write "1,679 cells", and a
+                # grader that silently drops every comma-formatted number scores
+                # a correct answer as having produced none.
+                found.append(float(m.group(1).replace(",", "").rstrip(".")))
             except (ValueError, IndexError):
                 continue
         hits = [v for v in found if lo <= v <= hi]

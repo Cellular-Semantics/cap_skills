@@ -152,6 +152,23 @@ def test_numeric_present_survives_either_table_orientation():
                          run(answer=answer)).passed
 
 
+def test_numeric_present_reads_thousands_separators():
+    """Agents write "1,679 cells". float("1,679") throws, so before this every
+    comma-formatted number was silently discarded and a correct answer scored as
+    having produced no numbers at all."""
+    answer = "27,034 cells: PCT 8,211, PST 4,002, TAL 1,530."
+    assert grade_one({"kind": "numeric_present", "pattern": r"([\d,]+)",
+                      "min": 8000, "max": 8500}, run(answer=answer)).passed
+    assert grade_one({"kind": "numeric_present", "pattern": r"([\d,]+)",
+                      "min": 27000, "max": 27100}, run(answer=answer)).passed
+
+
+def test_numeric_present_ignores_a_trailing_full_stop():
+    assert grade_one({"kind": "numeric_present", "pattern": r"([\d.,]+)",
+                      "min": 1500, "max": 1600},
+                     run(answer="The dataset has 1,530.")).passed
+
+
 def test_numeric_present_reports_what_it_saw_when_it_fails():
     res = grade_one({"kind": "numeric_present", "min": 90, "max": 95},
                     run(answer="54.5% and 47.1%"))
