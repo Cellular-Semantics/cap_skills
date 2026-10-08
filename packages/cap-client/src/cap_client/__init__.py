@@ -9,6 +9,6 @@ the supported interface and its --json output has stable field names.
 from .errors import CapError
 from .transport import GraphQLClient
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = ["CapError", "GraphQLClient", "__version__"]

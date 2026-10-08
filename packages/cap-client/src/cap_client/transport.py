@@ -30,6 +30,24 @@ CLIENT_EXTENSIONS = {"clientLibrary": {"name": "@apollo/client", "version": "4.1
 RETRY_CODES = (429, 500, 502, 503, 504)
 
 
+def fetch_page(url: str, timeout: float = 60.0) -> str:
+    """GET a celltype.info page as text.
+
+    Two of CAP's structures -- labelsets and per-label feedback -- have no
+    safelisted GraphQL operation and are only readable from the page's embedded
+    Next.js payload, so page fetching is a first-class need rather than a
+    workaround local to one module.
+    """
+    req = urllib.request.Request(url, headers={"user-agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, context=ssl_context(), timeout=timeout) as r:
+            return r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        raise CapError(f"HTTP {e.code} fetching {url} (dataset may be private)") from e
+    except (urllib.error.URLError, TimeoutError) as e:
+        raise CapError(f"Could not fetch {url}: {e}") from e
+
+
 def ssl_context() -> ssl.SSLContext:
     """certifi rather than the system store: aiohttp and some CI images cannot
     read the macOS keychain, and GCS/S3 then fail with CERTIFICATE_VERIFY_FAILED."""

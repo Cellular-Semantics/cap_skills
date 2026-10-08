@@ -37,19 +37,19 @@ Many CAP datasets expose no public h5ad at all, and then that route is closed �
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" \
     cap datasets [options]
 ```
 
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.3.0 or later (`cap --version`).
+0.4.0 or later (`cap --version`).
 
 Define the prefix once per shell if you are making several calls — but note that
 `CAP="uvx …"; $CAP datasets` does **not** work in zsh (the string is not
 re-split into words). Either write the command out each time, or use a function:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
 cap datasets --consortium "Human Cell Atlas" --format text
 ```
 
