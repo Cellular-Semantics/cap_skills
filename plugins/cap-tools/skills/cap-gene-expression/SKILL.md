@@ -31,7 +31,7 @@ regardless (see "Why not the h5ad").
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" \
     cap expression <cap-dataset-url> --genes GENE [GENE ...] [options]
 ```
 
@@ -39,12 +39,12 @@ Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $
 does not work in zsh, because the string is not re-split into words:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.3.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
 ```
 
 
 Needs `uv` and, on first run, network access to GitHub. Expects `cap-client`
-0.3.0 or later (`cap --version`).
+0.4.0 or later (`cap --version`).
 
 The full dataset URL is required; the labelset structure is read from the page.
 `cap-datasets` finds one if you have a name rather than a URL.

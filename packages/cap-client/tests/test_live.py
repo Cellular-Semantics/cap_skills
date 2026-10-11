@@ -141,3 +141,27 @@ def test_labelsets_are_suppressed_in_the_default_search():
 def test_consortium_tags_resolve():
     tags = consortium_tags(GraphQLClient(min_interval=0.5, log=lambda m: None))
     assert any(t["title"] == "Human Cell Atlas" and t["id"] == "1" for t in tags)
+
+
+def test_feedback_reads_filed_refinements():
+    """Dataset 1242 carries five `refine` entries moving trabecular-meshwork
+    labels off generic `fibroblast` onto the beam/JCT/Schlemm terms. It is the
+    canonical example of feedback that exists but has not reached the label.
+
+    Also pins the quirk that matters most when reading this data: a `refine`
+    carries no score, so a label with a filed correction still reads 0/0/0.
+    Never rank labels by score alone."""
+    from cap_client.feedback import fetch_feedback, with_feedback
+
+    labels = fetch_feedback("574", "1242")
+    assert len(labels) > 400
+    hits = with_feedback(labels)
+    assert {lb["label"] for lb in hits} >= {"BeamA", "JCT", "Schlemm_Endothelium"}
+
+    beam = next(lb for lb in hits if lb["label"] == "BeamA")
+    assert beam["agree"] == beam["disagree"] == beam["idk"] == 0
+    fb = beam["feedbacks"][0]
+    assert fb["type"] == "refine"
+    assert any(c["to"] == "beam A cell" for c in fb["changes"])
+    assert fb["user"] and "email" not in fb["user"]
+

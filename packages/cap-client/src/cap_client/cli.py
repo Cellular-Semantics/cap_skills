@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 
 from . import __version__
 from .datasets import DEFAULT_LIMIT, consortium_tags, resolve_consortium, search_datasets
@@ -22,6 +23,8 @@ from .downloads import download_urls, resolve_h5ad_url
 from .errors import CapError
 from .expression import PER_CELL_FIELDS, detect_embedding, fetch_expression, obs_columns
 from .expression import ROW_FIELDS as EXPR_FIELDS
+from .feedback import fetch_feedback, with_feedback
+from .feedback import summarise as summarise_feedback
 from .labelsets import fetch_labelsets, select_labelset, summarise
 from .output import emit_json, write_csv
 from .session import create_session
@@ -89,6 +92,27 @@ def cmd_consortia(args) -> int:
 
 
 # --- cap labelsets ---------------------------------------------------------
+
+def cmd_feedback(args, labels=None) -> int:
+    project_id, dataset_id = parse_target(args.target)
+    if labels is None:
+        labels = fetch_feedback(project_id, dataset_id, sleep=time.sleep)
+    rows = summarise_feedback(labels, dataset_id)
+    if args.csv:
+        write_csv(args.csv, list(rows[0]) if rows else
+                  ["dataset_id", "labelset", "label_id", "label", "count",
+                   "agree", "disagree", "idk", "n_feedback", "types", "users"], rows)
+    if args.format == "json":
+        emit_json({"dataset_id": dataset_id, "n_labels": len(labels),
+                   "n_with_feedback": len(rows),
+                   "labels": with_feedback(labels) if args.full else rows})
+    else:
+        print(f"{len(labels)} labels, {len(rows)} carrying feedback")
+        for r in rows:
+            print(f'{r["label_id"]:>8}  {r["label"][:34]:34s} '
+                  f'{r["types"]:24s} agree={r["agree"]:g} disagree={r["disagree"]:g}')
+    return 0
+
 
 def cmd_labelsets(args, labelsets=None) -> int:
     project_id, dataset_id = parse_target(args.target)
@@ -299,6 +323,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--delay", type=float, default=0.5, metavar="SECONDS")
     p.add_argument("--format", default="json", choices=["json", "text"])
     p.set_defaults(func=cmd_consortia)
+
+    p = sub.add_parser(
+        "feedback", help="Community feedback on a dataset's labels",
+        description="Scores and typed explanations readers have left on labels. "
+                    "Read from the page payload: CAP exposes no API for this.")
+    _common(p)
+    p.add_argument("--full", action="store_true",
+                   help="Emit every feedback entry, not one summary row per label")
+    p.add_argument("--csv", metavar="FILE", help="Also write the rows as CSV")
+    p.set_defaults(func=cmd_feedback)
 
     p = sub.add_parser("labelsets", help="List the labelsets and labels of a dataset")
     _common(p)

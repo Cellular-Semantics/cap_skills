@@ -9,25 +9,12 @@ from __future__ import annotations
 
 import json
 import re
-import urllib.error
-import urllib.request
 
 from .errors import CapError
 from .targets import dataset_page_url
-from .transport import ssl_context
+from .transport import fetch_page as _default_fetch_page
 
 _MARKER = '"__typename":"Labelset"'
-
-
-def _default_fetch_page(url: str) -> str:
-    req = urllib.request.Request(url, headers={"user-agent": "Mozilla/5.0"})
-    try:
-        with urllib.request.urlopen(req, context=ssl_context(), timeout=60) as r:
-            return r.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as e:
-        raise CapError(f"HTTP {e.code} fetching {url} (dataset may be private)") from e
-    except (urllib.error.URLError, TimeoutError) as e:
-        raise CapError(f"Could not fetch {url}: {e}") from e
 
 
 def parse_labelsets(html: str) -> dict[str, dict]:
