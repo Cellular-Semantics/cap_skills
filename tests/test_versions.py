@@ -120,6 +120,15 @@ def test_package_code_without_bump_fails(repo: Path) -> None:
     assert "packages/tool/pyproject.toml" in out.stdout
 
 
+def test_dunder_version_disagreeing_fails(repo: Path) -> None:
+    write(repo, "packages/tool/src/tool/__init__.py", '__version__ = "0.1.0"\n')
+    set_package_version(repo, "0.2.0")
+    commit(repo, "bump pyproject only")
+    out = run(repo, "check-bumps", "--base", "main")
+    assert out.returncode == 1
+    assert "__version__ = '0.1.0', pyproject.toml says '0.2.0'" in out.stdout
+
+
 def test_package_tests_and_readme_need_no_bump(repo: Path) -> None:
     write(repo, "packages/tool/tests/test_x.py", "def test(): pass\n")
     write(repo, "packages/tool/README.md", "docs\n")
