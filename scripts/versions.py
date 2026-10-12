@@ -5,7 +5,7 @@
     versions.py untagged                         releases whose tag does not exist yet
     versions.py pins [--tags N] [--at SHA]       every package pin users can be running
     versions.py report [--check FILE]            the plugin -> package table (docs/pins.md)
-    versions.py cli <dir>                        the console script packages/<dir> installs
+    versions.py cli <dir> [--at REF]             the console script packages/<dir> installs
 
 Standard library only, and it shells out to git rather than importing anything:
 CI runs it before any package is installed.
@@ -293,16 +293,21 @@ def report(n_tags: int, check: str | None) -> int:
 
 # --- cli ---------------------------------------------------------------------
 
-def cli(pkg_dir: str) -> int:
+def cli(pkg_dir: str, at: str | None) -> int:
     """The console script a package installs, which is what `uvx` must run.
 
     Not always the directory name: packages/cap-client installs `cap`. Read at
-    HEAD, so checking an old tag assumes the script has not been renamed since.
+    `at` -- the ref a pin names -- since an old plugin tag can pin a package that
+    has since been renamed or moved out of the repo. A ref that does not exist
+    yet (a tag this commit's release will cut) falls back to the working tree.
     """
-    pyproject = ROOT / "packages" / pkg_dir / "pyproject.toml"
-    if not pyproject.exists():
-        sys.exit(f"no package at packages/{pkg_dir}")
-    scripts = tomllib.loads(pyproject.read_text())["project"].get("scripts", {})
+    path = f"packages/{pkg_dir}/pyproject.toml"
+    text = show(at, path) if at else None
+    if text is None and (ROOT / path).exists():
+        text = (ROOT / path).read_text()
+    if text is None:
+        sys.exit(f"no package at packages/{pkg_dir}" + (f" at {at} or HEAD" if at else ""))
+    scripts = tomllib.loads(text)["project"].get("scripts", {})
     if len(scripts) != 1:
         sys.exit(f"packages/{pkg_dir} must declare exactly one console script, "
                  f"found {sorted(scripts) or 'none'}")
@@ -328,6 +333,7 @@ def main() -> int:
     r.add_argument("--check", metavar="FILE")
     c = sub.add_parser("cli")
     c.add_argument("dir", help="package directory under packages/")
+    c.add_argument("--at", metavar="REF", help="read the package as it is at REF")
     a = ap.parse_args()
 
     if a.cmd == "check-bumps":
@@ -337,7 +343,7 @@ def main() -> int:
     if a.cmd == "pins":
         return pins(a.tags, a.at)
     if a.cmd == "cli":
-        return cli(a.dir)
+        return cli(a.dir, a.at)
     return report(a.tags, a.check)
 
 

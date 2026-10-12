@@ -301,6 +301,29 @@ def test_cli_reads_console_script_not_directory(repo: Path) -> None:
     assert out.returncode == 0 and out.stdout == "t\n"
 
 
+def test_cli_at_reads_a_package_since_removed(repo: Path) -> None:
+    # An old plugin tag can pin a package that has since left the repo.
+    write(repo, "packages/gone/pyproject.toml",
+          '[project]\nname = "gone"\nversion = "0.1.0"\n'
+          '[project.scripts]\ngone = "gone.cli:main"\n')
+    commit(repo, "add gone")
+    sh(repo, "git", "tag", "old")
+    shutil.rmtree(repo / "packages/gone")
+    commit(repo, "remove gone")
+    assert run(repo, "cli", "gone").returncode != 0
+    out = run(repo, "cli", "gone", "--at", "old")
+    assert out.returncode == 0 and out.stdout == "gone\n"
+
+
+def test_cli_at_missing_ref_falls_back_to_head(repo: Path) -> None:
+    # A tag this commit's release will cut does not exist yet.
+    write(repo, "packages/tool/pyproject.toml",
+          '[project]\nname = "tool"\nversion = "0.1.0"\n'
+          '[project.scripts]\nt = "tool.cli:main"\n')
+    out = run(repo, "cli", "tool", "--at", "pkg-tool--v9.9.9")
+    assert out.returncode == 0 and out.stdout == "t\n"
+
+
 def test_cli_without_console_script_fails(repo: Path) -> None:
     out = run(repo, "cli", "tool")
     assert out.returncode != 0 and "exactly one console script" in out.stderr

@@ -67,8 +67,9 @@ jobs:
       - name: Check plugin pins resolve before tagging plugins
         run: |
           set -euo pipefail
+          ref_of() { local r=${1%%#*}; echo "${r##*@}"; }
           python3 scripts/versions.py pins --tags 0 | cut -f1 | while read -r pin; do
-            uvx --from "$pin" "$(python3 scripts/versions.py cli "${pin##*subdirectory=packages/}")" --version
+            uvx --from "$pin" "$(python3 scripts/versions.py cli "${pin##*subdirectory=packages/}" --at "$(ref_of "$pin")")" --version
           done
 
       - name: Tag plugins

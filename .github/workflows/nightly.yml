@@ -33,8 +33,10 @@ jobs:
         run: |
           set -uo pipefail
           status=0
+          ref_of() { local r=${1%%#*}; echo "${r##*@}"; }
           while IFS=$'\t' read -r pin where _; do
-            cli=$(python3 scripts/versions.py cli "${pin##*subdirectory=packages/}")
+            # Read at the pin's tag: an old release can pin a package since moved out.
+            cli=$(python3 scripts/versions.py cli "${pin##*subdirectory=packages/}" --at "$(ref_of "$pin")")
             echo "::group::$cli  (used by $where)"
             if uvx --from "$pin" "$cli" --version; then
               echo "resolves"
