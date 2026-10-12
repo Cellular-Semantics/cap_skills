@@ -31,7 +31,7 @@ regardless (see "Why not the h5ad").
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@pkg-cap-client--v0.4.0#subdirectory=packages/cap-client" \
     cap expression <cap-dataset-url> --genes GENE [GENE ...] [options]
 ```
 
@@ -39,7 +39,7 @@ Define it once per shell as a **function**, not a variable — `CAP="uvx …"; $
 does not work in zsh, because the string is not re-split into words:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@pkg-cap-client--v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
 ```
 
 
