@@ -125,6 +125,15 @@ def check_bumps(base: str) -> int:
     listed = {p["name"]: p for p in marketplace["plugins"]}
 
     for rel in releases():
+        if rel.kind == "package":
+            # `cap --version` prints __version__, not pyproject's version.
+            new = rel.version_at(None)
+            for init in sorted((ROOT / rel.path).glob("src/*/__init__.py")):
+                m = re.search(r'^__version__\s*=\s*["\']([^"\']+)["\']', init.read_text(), re.M)
+                if m and m[1] != new:
+                    problems.append(f"{rel.name}: {init.relative_to(ROOT)} says __version__ "
+                                    f"= {m[1]!r}, pyproject.toml says {new!r}")
+
         touched = [f for f in changed if f.startswith(rel.path + "/")]
         if rel.kind == "package":
             touched = [f for f in touched

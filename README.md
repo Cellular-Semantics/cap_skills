@@ -24,21 +24,19 @@ outside its own directory. Everything a skill needs at runtime arrives as a pinn
 installable dependency — which is what makes the plugin work on a machine that has
 only ever seen the plugin directory.
 
-## Install the plugin
+## Using the plugin
 
-Install into the project you are working in, rather than globally:
+Prerequisites: `uv`, and network access to GitHub on first run. The skills call
+their CLI through `uvx`, which builds and caches it; nothing else to install.
+
+### Install
+
+Into the project you are working in, rather than globally:
 
 ```sh
 claude plugin marketplace add Cellular-Semantics/cap_skills --scope local
 claude plugin install cap-tools@cap_skills --scope local
 ```
-
-`--scope local` writes `.claude/settings.local.json`, which is gitignored by
-convention: the plugin is available in this checkout, for you, and nowhere else.
-Nothing leaks into your other projects and nothing is committed. Remove it with
-`claude plugin uninstall cap-tools@cap_skills --scope local`.
-
-The three scopes, and when each is right:
 
 | scope | written to | who gets it |
 |---|---|---|
@@ -47,25 +45,12 @@ The three scopes, and when each is right:
 | `user` | `~/.claude/settings.json` | you, everywhere |
 
 `user` is the default if you omit `--scope`, which is usually more than you
-meant. Prefer `local` to try something out, `project` to give a repo's whole team
-the same tools.
+meant. Remove with `claude plugin uninstall cap-tools@cap_skills --scope local`.
 
-The skills invoke their CLIs with `uvx --from git+…@pkg-cap-client--vX.Y.Z`, so the only
-prerequisites are `uv` and network access to GitHub on first run. Environments are
-cached after that.
+### Set it up for a team repo
 
-### Setting it up for a repo
-
-To make these tools part of a repository's setup — so anyone who clones it has
-them without being told to install anything — install at **project** scope from
-inside that repo:
-
-```sh
-claude plugin marketplace add Cellular-Semantics/cap_skills --scope project
-claude plugin install cap-tools@cap_skills --scope project
-```
-
-That writes `.claude/settings.json`. **Commit it.**
+From inside the repo, use `--scope project` in the two commands above and
+**commit** the `.claude/settings.json` they write:
 
 ```json
 {
@@ -80,34 +65,34 @@ That writes `.claude/settings.json`. **Commit it.**
 }
 ```
 
-You can equally write that file by hand and skip the two commands — it is the
-whole of the configuration. It *enables* the plugin but does not download it:
-everyone else who clones the repo runs, once,
+That *enables* the plugin for everyone but does not download it. Each person
+runs, once per clone:
 
 ```sh
 claude plugin install cap-tools@cap_skills --scope project
 ```
 
-Three things worth knowing:
+If `.claude/settings.json` already exists, merge the two keys in. `atlas-tools`
+from [atlas-skills](https://github.com/Cellular-Semantics/atlas-skills) installs
+the same way and can sit alongside.
 
-- It layers rather than replaces. Someone who already has `cap-tools` at user
-  scope keeps that too; the project-scope copy takes precedence in this repo.
-- The marketplace tracks the default branch, so a clone gets the current release,
-  not the one you tested against — to fix that, pin a release (below). An
-  installed copy refreshes when the plugin's version string changes and someone
-  runs `claude plugin update`; auto-update is off by default for marketplaces
-  outside Anthropic's own.
+### Update
 
-To add these tools to a repo whose `.claude/settings.json` already exists, merge
-the two keys into it rather than overwriting.
+Updates are not automatic. To get the latest release, then restart Claude Code:
 
-`atlas-tools` from [atlas-skills](https://github.com/Cellular-Semantics/atlas-skills)
-installs the same way and is designed to be used alongside this one; both entries
-can sit in the same `.claude/settings.json`.
+```sh
+claude plugin marketplace update cap_skills
+claude plugin update cap-tools@cap_skills
+```
+
+`claude plugin list` shows which plugin version you have. Each version's
+[GitHub Release](https://github.com/Cellular-Semantics/cap_skills/releases) says
+what changed and which `cap-client` version its skills run.
 
 ### Pin a release
 
-Add a `ref` naming a plugin tag:
+To stay on one tested version instead of following the latest, add a `ref` to
+the marketplace source:
 
 ```json
 "source": {
@@ -117,39 +102,12 @@ Add a `ref` naming a plugin tag:
 }
 ```
 
-Claude Code reads the marketplace from that tag, and the plugin from the same
-checkout, so the project gets that release exactly — including the package pin
-in its skills. Each GitHub Release's notes carry this snippet with its own tag
-filled in.
+The project then gets that release exactly, including the package version its
+skills call. Each GitHub Release's notes carry this snippet with its tag filled in.
 
-**One registration per marketplace name per machine.** Claude Code keeps a
-single entry for `cap_skills` in `~/.claude/plugins/known_marketplaces.json`,
-not one per project, and a project's `ref` rewrites it — so a pinned project and
-an unpinned one on the same machine end up on whichever registered last. A ref
-pin is reliable where a machine needs one version of the plugin. (It does not
-touch `atlas-skills`, which is a different marketplace name.)
-
-## Versions
-
-| | Plugin | Package |
-|---|---|---|
-| Version lives in | `plugins/cap-tools/.claude-plugin/plugin.json` | `packages/cap-client/pyproject.toml` |
-| Tag | `cap-tools--v<version>` | `pkg-cap-client--v<version>` |
-| Who reads the tag | a ref-pinned marketplace | the `uvx --from …@<tag>` line in a skill |
-
-The two version independently: a skill-wording change bumps the plugin alone,
-and the package moves only when its code does. A plugin tag freezes its
-SKILL.md, and the SKILL.md holds the package pin, so a plugin release
-determines its package release. `docs/pins.md` shows the mapping for main; the
-nightly run's summary shows it for every supported tag.
-
-The older `v0.1.0`–`v0.4.0` tags, from when both shared one number, stay — old
-pins resolve against them. `cap-tools--v*` and `pkg-cap-client--v*` aliases
-name the same commits.
-
-The newest **3** `cap-tools` tags are supported: the nightly workflow
-re-installs every package they pin and runs its tests at that tag. Older tags
-still install, but nothing checks that they still work.
+Caveat: Claude Code keeps **one registration per marketplace name per machine**,
+so a pinned and an unpinned project on the same machine end up on whichever
+registered last. Pinning is reliable where a machine needs one version.
 
 ## Use the CLIs directly
 
@@ -171,13 +129,47 @@ writes CSV.
 **Be gentle with CAP's endpoints.** They are unauthenticated and public. Requests
 are serial and paced inside the client; do not parallelise.
 
+## Making a change
+
+The plugin and the package have separate versions. Bump what you changed, open a
+PR, merge. **Tagging and releasing are automatic** — never tag by hand.
+
+| You changed | Bump | Also |
+|---|---|---|
+| Skill text only | `plugin.json` | — |
+| Package code, compatible | `pyproject.toml` **and** `__version__` | to ship it: move the skills' pin to `pkg-cap-client--v<new>`, bump `plugin.json`, regenerate `docs/pins.md` |
+| CLI flags or output (breaking) | as above, minor while 0.x | update every skill that relies on the old behaviour |
+| Package tests, READMEs, `docs/` | nothing | — |
+
+Patch for fixes, minor for new features. A released version never changes.
+
+Before pushing:
+
+```sh
+./dev.sh                                                     # everything CI runs offline
+python3 scripts/versions.py check-bumps --base origin/main   # did you bump what you changed?
+python3 scripts/versions.py report > docs/pins.md            # after moving a pin
+```
+
+See `docs/package-iteration.md` for trying package changes before releasing them.
+
+### When a check fails
+
+| Check | Fix |
+|---|---|
+| `version-bumps`: "the version is still X" | bump the version file it names |
+| `version-bumps`: "tag … already exists" | that version is released; bump past it |
+| `version-bumps`: "`__version__` … pyproject.toml says …" | make the two agree |
+| `pins-report`: "docs/pins.md is stale" | `python3 scripts/versions.py report > docs/pins.md` |
+| `skill-pins-resolve`: "DOES NOT RESOLVE" | the pin names a tag that doesn't exist — usually a typo, or the package version wasn't bumped to match |
+| `nightly` | an old release no longer installs or passes tests, usually a dependency change upstream; the job log names the tag |
+| `release` failed after merge | fix the cause, then re-run it: `gh workflow run release.yml` |
+
 ## Develop
 
 ```sh
 ./dev.sh            # package, eval graders, release tooling, pins report
 ./dev.sh -m live    # also hit celltype.info (excluded from CI)
-python3 scripts/versions.py check-bumps --base origin/main   # before pushing
-python3 scripts/versions.py report > docs/pins.md            # after moving a pin
 ```
 
 The live suite exists for one thing the offline suite cannot cover: CAP enforces a
@@ -189,6 +181,10 @@ validating its transform against two known-good queries first.
 Two live tests pin conclusions from a real annotation review — STMN1 at ~54.5% in
 Tuft Progenitors versus ~47.1% in Tuft Cells, and `LRMP` failing to resolve because
 the symbol was retired in 2020 — so a refactor that changes the numbers is caught.
+
+Rules: deterministic and testable → the package, with tests; when/how/why →
+skill text. CLI output for agents is JSON with stable field names, and every CLI
+supports `--version`. Skills pin package tags, never a branch or commit.
 
 ## Reading per-cell obs
 
@@ -217,49 +213,35 @@ Not in CI — they cost money and depend on a live third-party dataset. The
 graders themselves are unit-tested and free (`pytest evals`). See
 `evals/README.md`; `./dev.sh` runs the grader tests alongside the packages.
 
-## Releasing
+## How releases are automated
 
-Releases are cut by CI from main, never by hand.
+| | Plugin | Package |
+|---|---|---|
+| Version lives in | `plugins/cap-tools/.claude-plugin/plugin.json` | `packages/cap-client/pyproject.toml` |
+| Tag | `cap-tools--v<version>` | `pkg-cap-client--v<version>` |
+| Read by | a marketplace `ref` pin | the `uvx --from …@<tag>` line in each skill |
 
-1. **Change the package**: edit, bump `pyproject.toml` and `__version__`.
-   `version-bumps` fails if the code changed and the version did not.
-2. **Adopt it in the plugin** — same PR or a later one: move the skills' pin to
-   the new package tag, bump `plugin.json`, regenerate `docs/pins.md`.
-3. Merge. Once `test` is green on main, `release` tags `pkg-cap-client--v<new>`,
-   checks it installs from a cold cache, then runs `claude plugin tag` — which
-   validates the plugin against the marketplace — and writes a GitHub Release
-   listing the plugin's package pins.
-
-A pin to a package tag that does not exist yet fails `skill-pins-resolve`,
-except the tag this very commit's release will cut: that is checked at the
-commit instead, since the tag can only appear after merge. For the few minutes
-between merge and `release` finishing, main pins a tag that does not exist yet.
-
-A skill-only change is step 2 alone.
-
-## Rules for changes
-
-- Deterministic and testable → a package, with tests. About when/how/why → skill text.
-- CLI output for agents is `--json`-shaped with stable field names, and every CLI
-  supports `--version`.
-- **Any change under `plugins/cap-tools/` bumps the plugin's version.** Installed
-  copies refresh only when the version string changes. CI enforces this.
-- **Any change to the package's code or `pyproject.toml` bumps its version.**
-  Tests, README and `uv.lock` do not. CI enforces this.
-- A released version never changes. CI refuses a bump to a version already tagged.
-- Changing a CLI contract is a breaking change: bump the package's major version
-  (minor while 0.x) and move the skills' pin deliberately.
-- Pin skills to package tags, never to a branch or commit.
-
-## CI
+A plugin tag freezes its skills, and the skills hold the package pin — so each
+plugin release fixes exactly which package version it runs. `docs/pins.md` shows
+that mapping for main.
 
 | Workflow | When | What |
 |---|---|---|
-| `test` | every PR and push | lint; `claude plugin validate`; package, grader and tooling tests on 3.11–3.13; `docs/pins.md` current; the package installs from git at the PR head; every pin on the branch resolves; on PRs, `version-bumps` |
-| `release` | after `test` passes on main | tag every untagged package, then plugin; a GitHub Release for each |
-| `nightly` | 03:17 UTC daily | every pin on main and at the supported tags installs; each pinned package tag's tests pass on a fresh install |
+| `test` | every PR and push | lint; plugin validation; tests on Python 3.11–3.13; `docs/pins.md` current; the package installs from git; every skill pin resolves; on PRs, `version-bumps` |
+| `release` | after `test` passes on main | tags any version that has no tag yet (package first, then plugin) and writes a GitHub Release for each |
+| `nightly` | 03:17 UTC daily | re-installs every pin used by main and the newest 3 plugin releases, and runs the package tests at each pinned tag |
 
-Why nightly: `uvx --from git+…` resolves dependencies fresh and ignores
-`uv.lock`, so a tag that worked when it was cut can break later without any
-commit. cap-client's one runtime dependency, `certifi`, is unpinned on purpose —
-it is the CA bundle, and a frozen one goes stale.
+Why nightly: `uvx` resolves dependencies fresh and ignores `uv.lock`, so a tag
+that worked when it was cut can break later with no commit. (cap-client's one
+dependency, `certifi`, is unpinned on purpose — a frozen CA bundle goes stale.)
+The newest 3 plugin releases are the supported ones; older tags still install,
+but nothing checks them.
+
+A pin to a package version released in the same PR can't resolve before merge,
+since its tag doesn't exist yet. CI checks that pin against the PR's commit
+instead, and `release` tags the package before the plugin. For the minute or two
+between merge and `release` finishing, main points at a tag that doesn't exist yet.
+
+The older `v0.1.0`–`v0.4.0` tags, from when plugin and package shared one number,
+stay so old pins keep working; the `cap-tools--v*` and `pkg-cap-client--v*` tags
+for those versions name the same commits.
