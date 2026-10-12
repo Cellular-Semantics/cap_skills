@@ -37,7 +37,7 @@ Many CAP datasets expose no public h5ad at all, and then that route is closed â€
 ## Command
 
 ```sh
-uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" \
+uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@pkg-cap-client--v0.4.0#subdirectory=packages/cap-client" \
     cap datasets [options]
 ```
 
@@ -49,7 +49,7 @@ Define the prefix once per shell if you are making several calls â€” but note th
 re-split into words). Either write the command out each time, or use a function:
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@pkg-cap-client--v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
 cap datasets --consortium "Human Cell Atlas" --format text
 ```
 

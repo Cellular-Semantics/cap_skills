@@ -19,7 +19,7 @@ is not closing*, which is a different claim from *this mapping is wrong*.
 ## Command
 
 ```sh
-cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
+cap() { uvx --from "git+https://github.com/Cellular-Semantics/cap_skills@pkg-cap-client--v0.4.0#subdirectory=packages/cap-client" cap "$@"; }
 
 cap feedback https://celltype.info/project/574/dataset/1242
 cap feedback <datasetURL> --format text          # one line per label
