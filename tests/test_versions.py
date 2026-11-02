@@ -194,6 +194,14 @@ def test_untagged_lists_packages_before_plugins(repo: Path) -> None:
     assert [r.split("\t")[3] for r in rows] == ["pkg-tool--v0.1.0", "thing--v1.0.0"]
 
 
+def test_current_lists_tagged_and_untagged(repo: Path) -> None:
+    # The release workflow writes a Release for any current tag lacking one,
+    # including a tag an earlier, failed run pushed.
+    sh(repo, "git", "tag", "pkg-tool--v0.1.0")
+    out = run(repo, "current").stdout.splitlines()
+    assert [line.split("\t")[3] for line in out] == ["pkg-tool--v0.1.0", "thing--v1.0.0"]
+
+
 def test_untagged_skips_released_versions(repo: Path) -> None:
     sh(repo, "git", "tag", "pkg-tool--v0.1.0")
     sh(repo, "git", "tag", "thing--v1.0.0")
@@ -284,6 +292,58 @@ def test_extras_pin_to_tag_this_commit_will_cut(repo: Path) -> None:
         "@pkg-tool--v0.1.0#", "@abc123#")
 
 
+@pytest.mark.parametrize("prefix", [
+    "tool[fast]@",          # no spaces
+    "tool[fast, slow] @ ",  # space after the comma
+    "tool_x[fast] @ ",      # underscore in the name
+    "Tool.X[fast] @ ",      # dot and capitals
+])
+def test_pin_with_other_extras_spellings_keeps_them(repo: Path, prefix: str) -> None:
+    write(repo, "plugins/thing/skills/thing/SKILL.md",
+          f'uvx --from "{prefix}{PIN.format(v="0.1.0")}" tool\n')
+    sh(repo, "git", "tag", "pkg-tool--v0.1.0")
+    assert spec_for(repo) == f"{prefix}{PIN.format(v='0.1.0')}"
+    assert "| `tool` | `pkg-tool--v0.1.0` |" in run(repo, "report").stdout
+
+
+UNPINNED = "git+https://github.com/example/repo#subdirectory=packages/tool"
+
+
+@pytest.mark.parametrize("prefix", ["", "tool[fast] @ ", "tool[fast]@"])
+def test_pin_without_a_ref_fails(repo: Path, prefix: str) -> None:
+    # Without spaces, the prefix's "@" must not be read as the ref.
+    write(repo, "plugins/thing/skills/thing/SKILL.md", f'uvx --from "{prefix}{UNPINNED}" tool\n')
+    out = run(repo, "pins", "--tags", "0")
+    assert out.returncode == 1 and "names no tag" in out.stderr
+    assert f"{prefix}{UNPINNED}" in out.stdout
+
+
+def test_pin_without_a_ref_at_an_old_tag_only_is_listed(repo: Path) -> None:
+    # A released tag cannot be fixed, so it must not block every later release.
+    write(repo, "plugins/thing/skills/thing/SKILL.md", f'uvx --from "{UNPINNED}" tool\n')
+    commit(repo, "unpinned")
+    sh(repo, "git", "tag", "thing--v1.0.0")
+    set_pin(repo, "0.1.0")
+    out = run(repo, "pins", "--tags", "1")
+    assert out.returncode == 0 and UNPINNED in out.stdout
+
+
+def test_report_shows_pin_without_a_ref(repo: Path) -> None:
+    write(repo, "plugins/thing/skills/thing/SKILL.md", f'uvx --from "{UNPINNED}" tool\n')
+    out = run(repo, "report")
+    assert out.returncode == 0
+    assert "| `thing` | 1.0.0 (main) | `tool` | **no tag** |" in out.stdout
+
+
+def test_pins_skip_ignored_files(repo: Path) -> None:
+    # A cache or venv under a plugin is not what CI sees; an untracked new file is.
+    write(repo, ".gitignore", "__pycache__/\n")
+    write(repo, "plugins/thing/hooks/__pycache__/x.pyc", PIN.format(v="0.0.1"))
+    write(repo, "plugins/thing/hooks/new.py", f'PIN = "{PIN.format(v="0.0.2")}"\n')
+    out = run(repo, "pins", "--tags", "0").stdout
+    assert "pkg-tool--v0.0.1" not in out and "pkg-tool--v0.0.2" in out
+
+
 def test_report_check_detects_stale_file(repo: Path) -> None:
     write(repo, "docs/pins.md", run(repo, "report").stdout)
     assert run(repo, "report", "--check", "docs/pins.md").returncode == 0
@@ -336,3 +396,20 @@ def test_cli_at_missing_ref_falls_back_to_head(repo: Path) -> None:
 def test_cli_without_console_script_fails(repo: Path) -> None:
     out = run(repo, "cli", "tool")
     assert out.returncode != 0 and "exactly one console script" in out.stderr
+
+
+def test_cli_prefers_script_named_after_directory(repo: Path) -> None:
+    # packages/onto-query installs `onto-query` and its alias `oq`.
+    write(repo, "packages/tool/pyproject.toml",
+          '[project]\nname = "tool"\nversion = "0.1.0"\n'
+          '[project.scripts]\nt = "tool.cli:main"\ntool = "tool.cli:main"\n')
+    out = run(repo, "cli", "tool")
+    assert out.returncode == 0 and out.stdout == "tool\n"
+
+
+def test_cli_with_several_scripts_none_named_after_directory_fails(repo: Path) -> None:
+    write(repo, "packages/tool/pyproject.toml",
+          '[project]\nname = "tool"\nversion = "0.1.0"\n'
+          '[project.scripts]\na = "tool.cli:main"\nb = "tool.cli:main"\n')
+    out = run(repo, "cli", "tool")
+    assert out.returncode != 0 and "['a', 'b']" in out.stderr
